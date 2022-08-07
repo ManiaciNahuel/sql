@@ -1,8 +1,8 @@
 let socket = io.connect();
 
-socket.on('productos', productos => {
-    console.log(productos);
-    render_products(productos);
+socket.on('productos', function(data) {
+    console.log(data);
+    render_products(data);
 });
 
 socket.on('messages', function(data) {
@@ -10,21 +10,20 @@ socket.on('messages', function(data) {
     render_messages(data);
 });
 
-function render_products(productos) {
-    console.log(`Estos son los productos ${productos[0]}`);
-    let html = productos.map(function(product, index) {
+function render_products(data) {
+    let html = data.map(function(product, index) {
         return (`<div>
-                <article style="margin-bottom: 40px">
-                        <img style="width: 90px; " src=${product.imagen} />
-                        <h3>
-                            ${product.title}
-                        </h3>
-                        <p>$
-                            ${product.price}
-                        </p>
-                    </article>
-                    <br>
-                `)
+            <article style="margin-bottom: 40px">
+                    <img style="width: 90px; " src=${product.imagen} />
+                    <h3>
+                        ${product.title}
+                    </h3>
+                    <p>$
+                        ${product.price}
+                    </p>
+                </article>
+                <br>
+            `)
     }).join(" ");
     document.getElementById('product_container').innerHTML = html;
 }

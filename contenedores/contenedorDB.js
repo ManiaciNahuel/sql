@@ -53,7 +53,7 @@ class ContenedorDB {
     async listarAll() {
         try {
             let productps = await this.knex.select().from(this.tabla)
-            console.log(productps);
+            console.log(productps[0].titulo);
             return productps
         } catch (error) {
             throw new Error(`Error al listar: ${error}`)

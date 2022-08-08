@@ -25,11 +25,6 @@ const mensajes = new ContenedorDB(sqlMensajes.config, sqlMensajes.table)
         io.sockets.emit('productos', productos.listarAll()) || console.log("Que");;
     });
 
-    
-    socket.on('update', data => {
-        mensajes.guardar(data);
-        io.sockets.emit('mensajes', mensajes);
-    }); 
 }); 
 */
 
@@ -57,9 +52,9 @@ app.set("view engine", "ejs");
 app.set("views", "./public/views/ejs");
 
 app.get('/', (request, respuesta) => {
-    let producs = productos.listarAll().then((producs) => {
-        console.log(`Productos cargados`) ||
-            producs.map(prod => respuesta.render("main", { prod }))
+    let producs = productos.listarAll().then((products) => {
+        console.log(`Productos cargados`) || console.log(JSON.parse(JSON.stringify(products))) ||
+            respuesta.render("index", { products })
     });
 
 })

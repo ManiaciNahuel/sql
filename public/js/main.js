@@ -11,6 +11,7 @@ socket.on('messages', function(data) {
 });
 
 function render_products(data) {
+    console.log("We trying");
     let html = data.map(function(product, index) {
         return (`<div>
             <article style="margin-bottom: 40px">

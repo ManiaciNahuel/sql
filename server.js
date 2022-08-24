@@ -2,76 +2,43 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
-
-const ContenedorDB = require('./contenedores/ContenedorDB.js')
-const { sqlProducts, sqlMensajes } = require('./options/mariaDB.js');
-
-const productos = new ContenedorDB(sqlProducts.config, sqlProducts.table)
-const mensajes = new ContenedorDB(sqlMensajes.config, sqlMensajes.table)
+const fs = require('fs')
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+require('dotenv').config()
 
 
-/* io.on('connection', async socket => {
-    console.log('Un cliente se ha conectado');
-    res.json(productos.listarAll())
-    socket.emit('productos', productos.guardar({
-        titulo: "Producto 111",
-        price: 1250,
-        imagen: "https://cdn3.iconfinder.com/data/icons/nature-37/120/aaqqdqqas-256.png"
-    }));
-    socket.emit('mensajes', mensajes.listarAll());
+//const { sqlProducts } = require('./options/mariaDB.js');
 
-    socket.on('update', producto => {
-        productos.guardar(producto);
-        io.sockets.emit('productos', productos.listarAll()) || console.log("Que");;
-    });
+const productos = require('./daos/index.js')
+//const productos = new ContenedorDB(sqlProducts.config, sqlProducts.table)
 
-}); 
-*/
-
-io.on('connection', function(socket) {
-    console.log('Un cliente se ha conectado');
-    socket.emit('productos', productos);
-
-    socket.on('new-product', function(data) {
-        productos.push(data);
-        io.sockets.emit('productos', productos);
-    });
-});
-
-io.on('connection', function(socket) {
-    console.log('Un cliente se ha conectado');
-    socket.emit('messages', messages);
-
-    socket.on('new-message', function(data) {
-        messages.push(data);
-        io.sockets.emit('messages', messages);
-    });
-});
-// Ejs
-app.set("view engine", "ejs");
-app.set("views", "./public/views/ejs");
-
-app.get('/', (request, respuesta) => {
-    let producs = productos.listarAll().then((products) => {
-        console.log(`Productos cargados`) || console.log(JSON.parse(JSON.stringify(products))) ||
-            respuesta.render("index", { products })
-    });
-
+app.get('/productos', async(req, respuesta) => {
+    respuesta.send(await productos.getAll())
 })
 
-app.get('/productos', (request, respuesta) => {
-    respuesta.render("form", { productos })
+app.get('/productos/:id', async(req, respuesta) => {
+    respuesta.send(await productos.getOne(req.params.id))
 })
 
-app.post('/productos', (req, res) => {
+app.post('/productos', async(req, res) => {
     const newObject = req.body
-    productos.push(newObject)
-    console.log(newObject);
-    res.redirect("/")
+    res.json(await productos.postNew(newObject))
+})
+
+app.put('/productos/:id', async(req, res) => {
+    const newObject = req.body
+    const id = req.params.id
+    res.json(await productos.upload(newObject, id))
+})
+
+app.delete('/productos/:id', async(req, res) => {
+    const id = req.params.id
+    res.json(await productos.delete(id))
 })
 
 
-const PORT = process.env.PORT || 8088;
+const PORT = process.env.PORT || 8080;
 
 const serv = server.listen(PORT, () => {
     console.log("Servidor HTTP escuchando en el puerto " + serv.address().port);

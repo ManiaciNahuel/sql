@@ -3,7 +3,7 @@ const fs = require("fs")
 class contenedorFs {
 
     constructor(ruta) {
-        this.ruta = `./public/${ruta}`;
+        this.ruta = `../${ruta}`;
     }
 
     getAll() {
